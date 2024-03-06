@@ -30,13 +30,11 @@ function App() {
 function StartButton({ samples }) {
   const [context, setContext] = useState();
 
-  useEffect(() => {
+  async function start() {
     function handleSampleBatch(batch) {
       if (batch === undefined) return;
 
       function newSampleBuffer(s) {
-        //console.log("batch: ", batch);
-
         let local_samples = s.concat(Array.from(batch));
 
         if (local_samples.length > 128 * BATCHES) {
@@ -45,17 +43,20 @@ function StartButton({ samples }) {
           );
         }
 
-        //console.log("local_samples: ", local_samples);
         return local_samples;
       }
 
       samples.current = newSampleBuffer(samples.current);
-      //setSamples((s) => newSampleBuffer(s));
-      //console.log("samples: ", samples);
     }
+
+    await Tone.start();
+    setContext(new AudioContext());
+    console.log("context:", context);
 
     const meter = new Tone.Meter();
     const mic = new Tone.UserMedia().connect(meter);
+
+    samples.current = [];
 
     mic
       .open()
@@ -79,12 +80,6 @@ function StartButton({ samples }) {
     }
 
     launchGraphWorker();
-  }, [context, samples]);
-
-  async function start() {
-    await Tone.start();
-    setContext(new AudioContext());
-    console.log(context);
   }
 
   return <button onClick={start}>start mic input</button>;
