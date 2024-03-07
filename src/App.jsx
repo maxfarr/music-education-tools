@@ -9,6 +9,15 @@ const GRAPH_UPDATE_MS = 40;
 
 const SamplesContext = createContext();
 
+const lineGreenHex = "#73AD21";
+const backgroundHex = "#202020";
+const buttonStyle = {
+  borderRadius: "10px",
+  border: "2px solid " + lineGreenHex,
+  backgroundColor: backgroundHex,
+  padding: "6px",
+};
+
 function App() {
   const samples = useRef([]);
   const [graphEnabled, setGraphEnabled] = useState(false);
@@ -18,8 +27,16 @@ function App() {
       <SamplesContext.Provider value={{ samples: samples }}>
         <StartButton samples={samples} />
 
-        <div>
-          {graphEnabled ? <Graph data={samples} /> : <p>off</p>}
+        <div
+          className="graphWidget"
+          style={{
+            borderRadius: "25px",
+            border: "2px solid " + lineGreenHex,
+            padding: "20px",
+            float: "right",
+          }}
+        >
+          {graphEnabled ? <Graph data={samples} /> : null}
           <ToggleGraphButton setEnabled={setGraphEnabled} />
         </div>
       </SamplesContext.Provider>
@@ -82,7 +99,11 @@ function StartButton({ samples }) {
     launchGraphWorker();
   }
 
-  return <button onClick={start}>start mic input</button>;
+  return (
+    <button onClick={start} style={buttonStyle}>
+      start mic input
+    </button>
+  );
 }
 
 function ToggleGraphButton({ setEnabled }) {
@@ -90,7 +111,11 @@ function ToggleGraphButton({ setEnabled }) {
     setEnabled((e) => !e);
   }
 
-  return <button onClick={stop}>toggle graph</button>;
+  return (
+    <button onClick={stop} style={buttonStyle}>
+      toggle graph
+    </button>
+  );
 }
 
 function Graph({ data }) {
@@ -131,7 +156,7 @@ function Graph({ data }) {
             GRAPH_WIDTH / (128 * BATCHES)
           }, 1.0)`
         )
-        .style("stroke", "red")
+        .style("stroke", lineGreenHex)
         .style("stroke-width", 3)
         .style("fill", "none");
     }, GRAPH_UPDATE_MS);
