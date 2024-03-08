@@ -22,6 +22,13 @@ const buttonStyle = {
   padding: "6px",
 };
 
+const widgetStyle = {
+  borderRadius: "25px",
+  border: "2px solid " + lineGreenHex,
+  padding: "20px",
+  float: "right",
+};
+
 function App() {
   const samples = useRef([]);
   const [graphEnabled, setGraphEnabled] = useState(false);
@@ -34,19 +41,11 @@ function App() {
             <StartMicButton samples={samples} />
           </div>
           <div>
-            <StartDetectionButton samples={samples} />
+            <PitchDetector samples={samples} />
           </div>
         </div>
 
-        <div
-          className="graphWidget"
-          style={{
-            borderRadius: "25px",
-            border: "2px solid " + lineGreenHex,
-            padding: "20px",
-            float: "right",
-          }}
-        >
+        <div className="graphWidget" style={widgetStyle}>
           {graphEnabled ? <Graph samples={samples} /> : null}
           <ToggleGraphButton setEnabled={setGraphEnabled} />
         </div>
@@ -98,7 +97,7 @@ function StartMicButton({ samples }) {
     async function launchGraphWorker() {
       try {
         await Tone.getContext().addAudioWorkletModule(
-          "../public/worklet/worker.js",
+          "../public/worker.js",
           "worker"
         );
         let node = Tone.getContext().createAudioWorkletNode("worker");
@@ -178,7 +177,7 @@ function Graph({ samples }) {
   );
 }
 
-function autoCorrelation(tau, samples) {
+function ACF(tau, samples) {
   let accum = 0.0;
   if (WINDOW_SIZE > samples.current.length) {
     return 0.0;
@@ -189,17 +188,51 @@ function autoCorrelation(tau, samples) {
   return accum;
 }
 
-function StartDetectionButton({ samples }) {
+function SDF(tau, samples) {
+  let accum = 0.0;
+  if (WINDOW_SIZE > samples.current.length) {
+    return 0.0;
+  }
+  for (let i = 0; i < WINDOW_SIZE - tau; i++) {
+    accum += Math.pow(samples.current[i] - samples.current[i + tau], 2);
+  }
+  return accum;
+}
+
+function NSDF(tau, samples) {
+  let accum = 0.0;
+  if (WINDOW_SIZE > samples.current.length) {
+    return 0.0;
+  }
+  for (let i = 0; i < WINDOW_SIZE - tau; i++) {
+    accum +=
+      Math.pow(samples.current[i], 2) + Math.pow(samples.current[i + tau], 2);
+  }
+  return (2 * ACF(tau, samples)) / accum;
+}
+
+function PitchDetector({ samples }) {
+  const [ACFtext, setACFtext] = useState("");
+  const [SDFtext, setSDFtext] = useState("");
+  const [NSDFtext, setNSDFtext] = useState("");
+
   function initDetection() {
     setInterval(() => {
-      console.log(autoCorrelation(440, samples));
+      setACFtext(ACF(440, samples).toString());
+      setSDFtext(SDF(440, samples).toString());
+      setNSDFtext(NSDF(440, samples).toString());
     }, PITCH_DETECT_MS);
   }
 
   return (
-    <button onClick={initDetection} style={buttonStyle}>
-      start pitch detection
-    </button>
+    <div className="detectorFrame" style={widgetStyle}>
+      <p>ACF: {ACFtext}</p>
+      <p>SDF: {SDFtext}</p>
+      <p>NSDF: {NSDFtext}</p>
+      <button onClick={initDetection} style={buttonStyle}>
+        start pitch detection
+      </button>
+    </div>
   );
 }
 
