@@ -2,16 +2,18 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import * as d3 from "d3";
 
-const BATCHES = 70;
+const BATCHES = 100;
 const GRAPH_WIDTH = 700;
 const GRAPH_HEIGHT = 400;
 const GRAPH_UPDATE_MS = 40;
 const PITCH_DETECT_MS = 100;
+const WINDOW_SIZE = BATCHES * 128;
 
 const SamplesContext = createContext();
 
 const lineGreenHex = "#73AD21";
 const backgroundHex = "#202020";
+
 const buttonStyle = {
   borderRadius: "10px",
   margin: "3px",
@@ -176,10 +178,21 @@ function Graph({ samples }) {
   );
 }
 
+function autoCorrelation(tau, samples) {
+  let accum = 0.0;
+  if (WINDOW_SIZE > samples.current.length) {
+    return 0.0;
+  }
+  for (let i = 0; i < WINDOW_SIZE - tau; i++) {
+    accum += samples.current[i] * samples.current[i + tau];
+  }
+  return accum;
+}
+
 function StartDetectionButton({ samples }) {
-  async function initDetection() {
+  function initDetection() {
     setInterval(() => {
-      console.log("detecting lol");
+      console.log(autoCorrelation(440, samples));
     }, PITCH_DETECT_MS);
   }
 
