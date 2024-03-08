@@ -6,6 +6,7 @@ const BATCHES = 70;
 const GRAPH_WIDTH = 700;
 const GRAPH_HEIGHT = 400;
 const GRAPH_UPDATE_MS = 40;
+const PITCH_DETECT_MS = 100;
 
 const SamplesContext = createContext();
 
@@ -13,6 +14,7 @@ const lineGreenHex = "#73AD21";
 const backgroundHex = "#202020";
 const buttonStyle = {
   borderRadius: "10px",
+  margin: "3px",
   border: "2px solid " + lineGreenHex,
   backgroundColor: backgroundHex,
   padding: "6px",
@@ -25,7 +27,14 @@ function App() {
   return (
     <>
       <SamplesContext.Provider value={{ samples: samples }}>
-        <StartButton samples={samples} />
+        <div className="buttons" style={{ float: "left" }}>
+          <div>
+            <StartMicButton samples={samples} />
+          </div>
+          <div>
+            <StartDetectionButton samples={samples} />
+          </div>
+        </div>
 
         <div
           className="graphWidget"
@@ -36,7 +45,7 @@ function App() {
             float: "right",
           }}
         >
-          {graphEnabled ? <Graph data={samples} /> : null}
+          {graphEnabled ? <Graph samples={samples} /> : null}
           <ToggleGraphButton setEnabled={setGraphEnabled} />
         </div>
       </SamplesContext.Provider>
@@ -44,7 +53,7 @@ function App() {
   );
 }
 
-function StartButton({ samples }) {
+function StartMicButton({ samples }) {
   const [context, setContext] = useState();
 
   async function start() {
@@ -118,7 +127,7 @@ function ToggleGraphButton({ setEnabled }) {
   );
 }
 
-function Graph({ data }) {
+function Graph({ samples }) {
   const [, setSucks] = useState();
 
   let line = d3
@@ -130,43 +139,54 @@ function Graph({ data }) {
       return d[1] * 300;
     });
 
-  useEffect(() => {
-    let id = setInterval(() => {
-      setSucks();
-      let datavals = [];
-      if (!(data.current === undefined || data.current.length === 0)) {
-        data.current.map((value, index) => {
-          datavals.push([index, value]);
-          return value;
-        });
-      }
+  setInterval(() => {
+    setSucks();
+    let datavals = [];
+    if (!(samples.current === undefined || samples.current.length === 0)) {
+      samples.current.map((value, index) => {
+        datavals.push([index, value]);
+        return value;
+      });
+    }
 
-      d3.select(".frame").select(".graph").selectAll("path").remove();
-      let svg = d3
-        .select(".frame")
-        .select(".graph")
-        .append("path")
-        .datum(datavals)
-        .attr("d", line)
-        .attr("width", GRAPH_WIDTH)
-        .attr("height", GRAPH_HEIGHT)
-        .attr(
-          "transform",
-          `translate(0, ${GRAPH_HEIGHT / 2}) scale(${
-            GRAPH_WIDTH / (128 * BATCHES)
-          }, 1.0)`
-        )
-        .style("stroke", lineGreenHex)
-        .style("stroke-width", 3)
-        .style("fill", "none");
-    }, GRAPH_UPDATE_MS);
-    return () => clearInterval(id);
-  }, [data, line]);
+    d3.select(".frame").select(".graph").selectAll("path").remove();
+    let svg = d3
+      .select(".frame")
+      .select(".graph")
+      .append("path")
+      .datum(datavals)
+      .attr("d", line)
+      .attr("width", GRAPH_WIDTH)
+      .attr("height", GRAPH_HEIGHT)
+      .attr(
+        "transform",
+        `translate(0, ${GRAPH_HEIGHT / 2}) scale(${
+          GRAPH_WIDTH / (128 * BATCHES)
+        }, 1.0)`
+      )
+      .style("stroke", lineGreenHex)
+      .style("stroke-width", 3)
+      .style("fill", "none");
+  }, GRAPH_UPDATE_MS);
 
   return (
     <div className="frame">
       <svg className="graph" width={GRAPH_WIDTH} height={GRAPH_HEIGHT}></svg>
     </div>
+  );
+}
+
+function StartDetectionButton({ samples }) {
+  async function initDetection() {
+    setInterval(() => {
+      console.log("detecting lol");
+    }, PITCH_DETECT_MS);
+  }
+
+  return (
+    <button onClick={initDetection} style={buttonStyle}>
+      start pitch detection
+    </button>
   );
 }
 
