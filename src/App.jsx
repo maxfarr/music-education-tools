@@ -15,7 +15,7 @@ const INPUT_SAMPLE_RATE = 44100.0;
 
 const SamplesContext = createContext();
 
-const lineGreenHex = "#73AD21";
+const lineGreenHex = "#8ED42C";
 const backgroundHex = "#202020";
 
 const buttonStyle = {
@@ -24,6 +24,7 @@ const buttonStyle = {
   border: "2px solid " + lineGreenHex,
   backgroundColor: backgroundHex,
   padding: "6px",
+  color: lineGreenHex,
 };
 
 const widgetStyle = {
@@ -31,6 +32,10 @@ const widgetStyle = {
   border: "2px solid " + lineGreenHex,
   padding: "20px",
   float: "right",
+};
+
+const textStyle = {
+  color: lineGreenHex,
 };
 
 function App() {
@@ -100,7 +105,10 @@ function StartMicButton({ samples }) {
 
     async function launchGraphWorker() {
       try {
-        await Tone.getContext().addAudioWorkletModule("./worker.js", "worker");
+        await Tone.getContext().addAudioWorkletModule(
+          "./worklet/worker.js",
+          "worker"
+        );
         let node = Tone.getContext().createAudioWorkletNode("worker");
         meter.connect(node);
         node.port.onmessage = (e) => handleSampleBatch(e.data[0][0]);
@@ -398,11 +406,11 @@ function PitchDetector({ samples }) {
         height={GRAPH_HEIGHT}
         ref={svgRef}
       ></svg>
-      <p>
+      <p style={textStyle}>
         detected peak: {peakTau.toString()} samples (
         {peakTau === 0 ? "NaN" : (INPUT_SAMPLE_RATE / peakTau).toString()} Hz)
       </p>
-      <p>detected note: {note}</p>
+      <p style={textStyle}>detected note: {note}</p>
       <button onClick={initDetection} style={buttonStyle}>
         start pitch detection
       </button>
