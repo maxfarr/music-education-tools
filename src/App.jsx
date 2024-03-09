@@ -100,10 +100,7 @@ function StartMicButton({ samples }) {
 
     async function launchGraphWorker() {
       try {
-        await Tone.getContext().addAudioWorkletModule(
-          "../public/worker.js",
-          "worker"
-        );
+        await Tone.getContext().addAudioWorkletModule("./worker.js", "worker");
         let node = Tone.getContext().createAudioWorkletNode("worker");
         meter.connect(node);
         node.port.onmessage = (e) => handleSampleBatch(e.data[0][0]);
@@ -145,7 +142,7 @@ function Graph({ samples }) {
     });
 
   setInterval(() => {
-    //setSucks();
+    setSucks();
     let datavals = [];
     if (!(samples.current === undefined || samples.current.length === 0)) {
       samples.current.map((value, index) => {
@@ -347,7 +344,7 @@ function PitchDetector({ samples }) {
             datavals[i - 1][1] > threshold &&
             datavals[i][1] < datavals[i - 1][1]
           ) {
-            setPeakTau(i);
+            setPeakTau(i - 1);
             break;
           }
         }
