@@ -11,7 +11,7 @@ const WINDOW_SIZE = BATCHES * 128;
 
 const MAX_TAU = 600;
 
-const INPUT_SAMPLE_RATE = 44100.0;
+let INPUT_SAMPLE_RATE = 44100.0;
 
 const SamplesContext = createContext();
 
@@ -112,7 +112,7 @@ function StartMicButton({ samples }) {
       } catch (e) {}
     }
 
-    console.log(Tone.getContext().sampleRate);
+    INPUT_SAMPLE_RATE = Tone.getContext().sampleRate;
 
     launchGraphWorker();
   }
