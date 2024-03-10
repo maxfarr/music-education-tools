@@ -31,22 +31,27 @@ const NOTE_LETTERS = [
   "G#",
 ];
 
-const lineGreenHex = "#73AD21";
+const mainColorHex = "#af1f0e";
 const backgroundHex = "#202020";
 
 const buttonStyle = {
   borderRadius: "10px",
   margin: "3px",
-  border: "2px solid " + lineGreenHex,
+  border: "2px solid " + mainColorHex,
   backgroundColor: backgroundHex,
   padding: "6px",
+  color: mainColorHex,
 };
 
 const widgetStyle = {
   borderRadius: "25px",
-  border: "2px solid " + lineGreenHex,
+  border: "2px solid " + mainColorHex,
   padding: "20px",
   float: "right",
+};
+
+const textStyle = {
+  color: mainColorHex,
 };
 
 function App() {
@@ -177,7 +182,7 @@ function Graph({ samples }) {
           GRAPH_WIDTH_PX / (128 * BATCHES)
         }, 1.0)`
       )
-      .style("stroke", lineGreenHex)
+      .style("stroke", mainColorHex)
       .style("stroke-width", 3)
       .style("fill", "none");
   }, GRAPH_UPDATE_MS);
@@ -250,11 +255,12 @@ function PitchDetector({ samples }) {
     svg
       .append("g")
       .attr("transform", `translate(0,${GRAPH_HEIGHT_PX * 0.9})`)
+      .style("color", mainColorHex)
       .call(d3.axisBottom(x));
 
     svg
       .append("line")
-      .style("stroke", lineGreenHex)
+      .style("stroke", mainColorHex)
       .attr("x1", 0)
       .attr("y1", GRAPH_HEIGHT_PX / 2)
       .attr("x2", GRAPH_WIDTH_PX)
@@ -343,7 +349,7 @@ function PitchDetector({ samples }) {
             GRAPH_WIDTH_PX / 600
           }, 1.0)`
         )
-        .style("stroke", lineGreenHex)
+        .style("stroke", mainColorHex)
         .style("stroke-width", 3)
         .style("fill", "none");
     }, PITCH_DETECT_MS);
@@ -357,11 +363,11 @@ function PitchDetector({ samples }) {
         height={GRAPH_HEIGHT_PX}
         ref={svgRef}
       ></svg>
-      <p>
+      <p style={textStyle}>
         detected peak: {peakTau.toString()} samples (
         {peakTau === 0 ? "NaN" : (INPUT_SAMPLE_RATE / peakTau).toString()} Hz)
       </p>
-      <p>detected note: {note}</p>
+      <p style={textStyle}>detected note: {note}</p>
       <button onClick={initDetection} style={buttonStyle}>
         start pitch detection
       </button>
