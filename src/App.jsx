@@ -11,7 +11,7 @@ const WINDOW_SIZE = BATCHES * 128;
 
 const MAX_TAU = 600;
 
-let INPUT_SAMPLE_RATE = 44100.0;
+let INPUT_SAMPLE_RATE = 1.0;
 
 const SamplesContext = createContext();
 
@@ -87,6 +87,7 @@ function StartMicButton({ samples }) {
 
     await Tone.start();
     INPUT_SAMPLE_RATE = Tone.getContext().sampleRate;
+    console.log(INPUT_SAMPLE_RATE);
     setContext(new AudioContext({ sampleRate: INPUT_SAMPLE_RATE }));
     console.log("context:", context);
 
