@@ -112,6 +112,8 @@ function StartMicButton({ samples }) {
       } catch (e) {}
     }
 
+    console.log(Tone.getContext().sampleRate);
+
     launchGraphWorker();
   }
 
