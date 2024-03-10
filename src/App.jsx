@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import * as d3 from "d3";
 
@@ -12,7 +12,7 @@ const MAX_TAU = 600;
 const BATCHES = 80;
 const WINDOW_SIZE = BATCHES * 128;
 
-const INPUT_SAMPLE_RATE = 44100.0;
+let INPUT_SAMPLE_RATE = 44100.0;
 
 const SamplesContext = createContext();
 
@@ -75,8 +75,6 @@ function App() {
 }
 
 function StartMicButton({ samples }) {
-  const [context, setContext] = useState();
-
   async function start() {
     function handleSampleBatch(batch) {
       if (batch === undefined) return;
@@ -97,8 +95,8 @@ function StartMicButton({ samples }) {
     }
 
     await Tone.start();
-    setContext(new AudioContext({ sampleRate: INPUT_SAMPLE_RATE }));
-    console.log("context:", context);
+    INPUT_SAMPLE_RATE = Tone.getContext().sampleRate;
+    console.log("sample rate: " + INPUT_SAMPLE_RATE.toString());
 
     const meter = new Tone.Meter();
     const mic = new Tone.UserMedia().connect(meter);
