@@ -114,10 +114,7 @@ function StartMicButton({ samples }) {
 
     async function launchGraphWorker() {
       try {
-        await Tone.getContext().addAudioWorkletModule(
-          "../public/worker.js",
-          "worker"
-        );
+        await Tone.getContext().addAudioWorkletModule("./worker.js", "worker");
         let node = Tone.getContext().createAudioWorkletNode("worker");
         meter.connect(node);
         node.port.onmessage = (e) => handleSampleBatch(e.data[0][0]);
