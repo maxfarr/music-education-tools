@@ -86,6 +86,7 @@ function StartMicButton({ samples }) {
     }
 
     await Tone.start();
+    INPUT_SAMPLE_RATE = Tone.getContext().sampleRate;
     setContext(new AudioContext({ sampleRate: INPUT_SAMPLE_RATE }));
     console.log("context:", context);
 
@@ -111,8 +112,6 @@ function StartMicButton({ samples }) {
         node.port.onmessage = (e) => handleSampleBatch(e.data[0][0]);
       } catch (e) {}
     }
-
-    INPUT_SAMPLE_RATE = Tone.getContext().sampleRate;
 
     launchGraphWorker();
   }
