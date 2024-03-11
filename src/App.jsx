@@ -1,4 +1,5 @@
 import { createContext, useEffect, useRef, useState } from "react";
+import PitchDetector from "./PitchDetector";
 import * as Tone from "tone";
 import * as d3 from "d3";
 
@@ -6,13 +7,14 @@ const GRAPH_WIDTH_PX = 700;
 const GRAPH_HEIGHT_PX = 400;
 
 const GRAPH_UPDATE_MS = 40;
-const PITCH_DETECT_MS = 100;
+const PITCH_DETECT_MS = 10;
 
-const MAX_TAU = 600;
 const BATCHES = 80;
 const WINDOW_SIZE = BATCHES * 128;
 
-let INPUT_SAMPLE_RATE = 44100.0;
+let INPUT_SAMPLE_RATE = 48000.0;
+
+const CLARITY_THRESHOLD = 0.75;
 
 const SamplesContext = createContext();
 
@@ -30,6 +32,16 @@ const NOTE_LETTERS = [
   "G",
   "G#",
 ];
+
+const C_MAJOR = ["C", "D", "E", "F", "G", "A", "B"];
+const G_MAJOR = ["G", "A", "B", "C", "D", "E", "F#"];
+const D_MAJOR = ["D", "E", "F#", "G", "A", "B", "C#"];
+
+const NOTE_TO_FREQ_DENOM = Math.log10(Math.pow(2, 1 / 12));
+function noteFromFreq(freq) {
+  const midi = Math.log10(freq / 27.5) / NOTE_TO_FREQ_DENOM;
+  return NOTE_LETTERS[Math.round(midi) % 12];
+}
 
 const mainColorHex = "#af1f0e";
 const backgroundHex = "#202020";
@@ -66,7 +78,8 @@ function App() {
             <StartMicButton samples={samples} />
           </div>
           <div>
-            <PitchDetector samples={samples} />
+            {/* <PitchDetector samples={samples} /> */}
+            <ScaleGame samples={samples} sampleRate={INPUT_SAMPLE_RATE} />
           </div>
         </div>
 
@@ -77,6 +90,75 @@ function App() {
       </SamplesContext.Provider>
     </>
   );
+}
+
+function ScaleGame({ samples, sampleRate }) {
+  const [gameRunning, setGameRunning] = useState(false);
+  const detectedNote = useRef("");
+  const previousDetectedNote = useRef("");
+  const currentCounter = useRef(0);
+
+  const detector = useRef();
+
+  function onDetectFreq(freq, clarity) {
+    const note = noteFromFreq(freq);
+    if (note === previousDetectedNote.current) {
+      currentCounter.current += 1;
+      if (currentCounter.current === 14) {
+        // console.log("note", note);
+        // console.log("clarity", clarity);
+        if (clarity > CLARITY_THRESHOLD) {
+          console.log(`note ${note} with clarity ${clarity}`);
+        }
+      }
+    } else {
+      //console.log("reset");
+      currentCounter.current = 0;
+    }
+    previousDetectedNote.current = detectedNote.current;
+    detectedNote.current = note;
+  }
+
+  function startGame() {
+    detector.current.start();
+    setGameRunning(true);
+  }
+
+  function stopGame() {
+    detector.current.stop();
+    setGameRunning(false);
+  }
+
+  useEffect(() => {
+    detector.current = new PitchDetector(
+      samples,
+      sampleRate,
+      PITCH_DETECT_MS,
+      WINDOW_SIZE,
+      0.9,
+      onDetectFreq
+    );
+
+    return () => {
+      detector.current.stop();
+    };
+  }, []);
+
+  return (
+    <>
+      {gameRunning ? <p>yes</p> : <p>no</p>}
+      <StartGameButton startGame={startGame} />
+      <StopGameButton stopGame={stopGame} />
+    </>
+  );
+}
+
+function StartGameButton({ startGame }) {
+  return <button onClick={() => startGame()}>start</button>;
+}
+
+function StopGameButton({ stopGame }) {
+  return <button onClick={() => stopGame()}>stop</button>;
 }
 
 function StartMicButton({ samples }) {
@@ -194,180 +276,6 @@ function Graph({ samples }) {
         width={GRAPH_WIDTH_PX}
         height={GRAPH_HEIGHT_PX}
       ></svg>
-    </div>
-  );
-}
-
-function ACF(tau, samples) {
-  let accum = 0.0;
-  if (WINDOW_SIZE > samples.current.length) {
-    return 0.0;
-  }
-  for (let i = 0; i < WINDOW_SIZE - tau; i++) {
-    accum += samples.current[i] * samples.current[i + tau];
-  }
-  return accum;
-}
-
-function NSDF(tau, samples) {
-  let accum = 0.0;
-  if (WINDOW_SIZE > samples.current.length) {
-    return 0.0;
-  }
-  for (let i = 0; i < WINDOW_SIZE - tau; i++) {
-    accum +=
-      Math.pow(samples.current[i], 2) + Math.pow(samples.current[i + tau], 2);
-  }
-  return (2 * ACF(tau, samples)) / accum;
-}
-
-const MATH_DENOM = Math.log10(Math.pow(2, 1 / 12));
-
-function PitchDetector({ samples }) {
-  const svgRef = useRef();
-  const [peakTau, setPeakTau] = useState(0);
-
-  function noteFromTau(tau) {
-    const freq = INPUT_SAMPLE_RATE / tau;
-    const midi = Math.log10(freq / 27.5) / MATH_DENOM;
-    return NOTE_LETTERS[Math.round(midi) % 12];
-  }
-
-  const note = noteFromTau(peakTau);
-
-  let line = d3
-    .line()
-    .x((_, i) => {
-      return i;
-    })
-    .y((d) => {
-      return d * -150;
-    });
-
-  const k = 0.9;
-
-  useEffect(() => {
-    // draw axis
-    var svg = d3.select(".detectorFrame").select(".graph");
-
-    var x = d3.scaleLinear().domain([1, MAX_TAU]).range([0, GRAPH_WIDTH_PX]);
-
-    svg
-      .append("g")
-      .attr("transform", `translate(0,${GRAPH_HEIGHT_PX * 0.9})`)
-      .style("color", mainColorHex)
-      .call(d3.axisBottom(x));
-
-    svg
-      .append("line")
-      .style("stroke", mainColorHex)
-      .attr("x1", 0)
-      .attr("y1", GRAPH_HEIGHT_PX / 2)
-      .attr("x2", GRAPH_WIDTH_PX)
-      .attr("y2", GRAPH_HEIGHT_PX / 2)
-      .style("stroke-dasharray", "3, 3");
-  });
-
-  function initDetection() {
-    setInterval(() => {
-      let datavals = [];
-
-      let positiveZeroCrossings = [];
-      let negativeZeroCrossings = [];
-
-      if (samples.current === undefined || samples.current.length === 0) {
-        return;
-      }
-
-      for (let i = 0; i < MAX_TAU; i++) {
-        let val = NSDF(i + 1, samples);
-        datavals.push(val);
-      }
-
-      for (let i = 1; i < MAX_TAU; i++) {
-        if (datavals[i] >= 0 && datavals[i - 1] < 0) {
-          positiveZeroCrossings.push(i);
-        }
-
-        if (datavals[i] <= 0 && datavals[i - 1] > 0) {
-          negativeZeroCrossings.push(i);
-        }
-      }
-
-      // TODO: figure this mess out
-      let calculatePeak = true;
-      if (positiveZeroCrossings.length === 0) {
-        //throw new Error("initDetection: no positive zero crossings");
-        //console.log("initDetection: no positive zero crossings");
-        calculatePeak = false;
-      }
-      if (negativeZeroCrossings.length === 0) {
-        //throw new Error("initDetection: no negative zero crossings");
-        //console.log("initDetection: no negative zero crossings");
-        calculatePeak = false;
-      }
-      if (negativeZeroCrossings[0] > positiveZeroCrossings[0]) {
-        //throw new Error("first crossing is not negative");
-        //console.log("first crossing is not negative");
-        calculatePeak = false;
-      }
-
-      if (calculatePeak) {
-        let maxval = datavals[positiveZeroCrossings[0]];
-        for (let i = positiveZeroCrossings[0]; i < MAX_TAU; i++) {
-          let val = datavals[i];
-          if (val > maxval) {
-            maxval = val;
-          }
-        }
-
-        let threshold = maxval * k;
-
-        for (let i = positiveZeroCrossings[0]; i < MAX_TAU; i++) {
-          if (datavals[i - 1] > threshold && datavals[i] < datavals[i - 1]) {
-            setPeakTau(i);
-            break;
-          }
-        }
-      }
-
-      d3.select(".detectorFrame").select(".graph").selectAll("path").remove();
-      let svg = d3
-        .select(".detectorFrame")
-        .select(".graph")
-        .append("path")
-        .datum(datavals)
-        .attr("d", line)
-        .attr("width", GRAPH_WIDTH_PX)
-        .attr("height", GRAPH_HEIGHT_PX)
-        .attr(
-          "transform",
-          `translate(0, ${GRAPH_HEIGHT_PX / 2}) scale(${
-            GRAPH_WIDTH_PX / 600
-          }, 1.0)`
-        )
-        .style("stroke", mainColorHex)
-        .style("stroke-width", 3)
-        .style("fill", "none");
-    }, PITCH_DETECT_MS);
-  }
-
-  return (
-    <div className="detectorFrame" style={widgetStyle}>
-      <svg
-        className="graph"
-        width={GRAPH_WIDTH_PX}
-        height={GRAPH_HEIGHT_PX}
-        ref={svgRef}
-      ></svg>
-      <p style={textStyle}>
-        detected peak: {peakTau.toString()} samples (
-        {peakTau === 0 ? "NaN" : (INPUT_SAMPLE_RATE / peakTau).toString()} Hz)
-      </p>
-      <p style={textStyle}>detected note: {note}</p>
-      <button onClick={initDetection} style={buttonStyle}>
-        start pitch detection
-      </button>
     </div>
   );
 }
