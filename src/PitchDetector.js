@@ -1,11 +1,20 @@
 const MAX_TAU = 600;
 
 export default class PitchDetector {
-  constructor(samples, sampleRate = 100, rateMS, W, k, onDetectFreq) {
+  constructor(
+    samples,
+    sampleRate = 100,
+    rateMS,
+    W,
+    k,
+    onDetectFreq,
+    onComputeNSDF
+  ) {
     this.samples = samples;
     this.sampleRate = sampleRate;
     this.rateMS = rateMS;
     this.onDetectFreq = onDetectFreq;
+    this.onComputeNSDF = onComputeNSDF;
     this.k = k;
     this.W = W;
 
@@ -55,6 +64,8 @@ export default class PitchDetector {
         let val = this.NSDF(i + 1, this.samples);
         datavals.push(val);
       }
+
+      this.onComputeNSDF(datavals);
 
       for (let i = 1; i < MAX_TAU; i++) {
         if (datavals[i] >= 0 && datavals[i - 1] < 0) {
