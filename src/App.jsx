@@ -237,11 +237,11 @@ function PitchDetector({ samples }) {
 
   let line = d3
     .line()
-    .x((d) => {
-      return d[0];
+    .x((_, i) => {
+      return i;
     })
     .y((d) => {
-      return d[1] * -150;
+      return d * -150;
     });
 
   const k = 0.9;
@@ -281,15 +281,15 @@ function PitchDetector({ samples }) {
 
       for (let i = 0; i < MAX_TAU; i++) {
         let val = NSDF(i + 1, samples);
-        datavals.push([i, val]);
+        datavals.push(val);
       }
 
       for (let i = 1; i < MAX_TAU; i++) {
-        if (datavals[i][1] >= 0 && datavals[i - 1][1] < 0) {
+        if (datavals[i] >= 0 && datavals[i - 1] < 0) {
           positiveZeroCrossings.push(i);
         }
 
-        if (datavals[i][1] <= 0 && datavals[i - 1][1] > 0) {
+        if (datavals[i] <= 0 && datavals[i - 1] > 0) {
           negativeZeroCrossings.push(i);
         }
       }
@@ -313,9 +313,9 @@ function PitchDetector({ samples }) {
       }
 
       if (calculatePeak) {
-        let maxval = datavals[positiveZeroCrossings[0]][1];
+        let maxval = datavals[positiveZeroCrossings[0]];
         for (let i = positiveZeroCrossings[0]; i < MAX_TAU; i++) {
-          let val = datavals[i][1];
+          let val = datavals[i];
           if (val > maxval) {
             maxval = val;
           }
@@ -324,10 +324,7 @@ function PitchDetector({ samples }) {
         let threshold = maxval * k;
 
         for (let i = positiveZeroCrossings[0]; i < MAX_TAU; i++) {
-          if (
-            datavals[i - 1][1] > threshold &&
-            datavals[i][1] < datavals[i - 1][1]
-          ) {
+          if (datavals[i - 1] > threshold && datavals[i] < datavals[i - 1]) {
             setPeakTau(i);
             break;
           }
