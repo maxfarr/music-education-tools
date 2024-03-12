@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import PitchDetector from "./PitchDetector";
 import * as Tone from "tone";
 import * as d3 from "d3";
@@ -14,7 +14,7 @@ const WINDOW_SIZE = BATCHES * 128;
 
 let INPUT_SAMPLE_RATE = 48000.0;
 
-const CLARITY_THRESHOLD = 0.65;
+const CLARITY_THRESHOLD = 0.85;
 const MAX_TAU = 600;
 
 const SamplesContext = createContext();
@@ -54,6 +54,19 @@ const buttonStyle = {
   backgroundColor: backgroundHex,
   padding: "6px",
   color: mainColorHex,
+  fontFamily: "donegal",
+  fontSize: 24,
+};
+
+const graphButtonStyle = {
+  borderRadius: "10px",
+  margin: "3px",
+  border: "2px solid " + mainColorHex,
+  backgroundColor: backgroundHex,
+  padding: "6px",
+  color: mainColorHex,
+  fontFamily: "donegal",
+  fontSize: 18,
 };
 
 const widgetStyle = {
@@ -71,6 +84,16 @@ const boxStyle = {
 
 const textStyle = {
   color: mainColorHex,
+  fontFamily: "donegal",
+  fontSize: 24,
+  textAlign: "center",
+};
+
+const mainTextStyle = {
+  color: mainColorHex,
+  fontFamily: "donegal",
+  textAlign: "center",
+  fontSize: 80,
 };
 
 function App() {
@@ -130,29 +153,33 @@ function App() {
 
   return (
     <>
-      <SamplesContext.Provider value={{ samples: samples }}>
-        <div className="buttons" style={{ float: "left" }}>
-          <div>
-            {/* <PitchDetector samples={samples} /> */}
-            <ScaleGame
-              samples={samples}
-              sampleRate={INPUT_SAMPLE_RATE}
-              NSDFvals={NSDFvals}
-              initAudioInput={micInputSetup}
-            />
-          </div>
+      <div className="graphWidget" style={widgetStyle}>
+        <div style={boxStyle}>
+          {graphEnabled ? <Graph samples={samples} /> : null}
+          <ToggleGraphButton setEnabled={setGraphEnabled} />
         </div>
 
-        <div className="graphWidget" style={widgetStyle}>
-          <div style={boxStyle}>
-            {graphEnabled ? <Graph samples={samples} /> : null}
-            <ToggleGraphButton setEnabled={setGraphEnabled} />
-          </div>
+        <div style={boxStyle}>
+          {NSDFGraphEnabled ? <NSDFGraph vals={NSDFvals} /> : null}
+          <ToggleGraphButton setEnabled={setNSDFGraphEnabled} />
+        </div>
+      </div>
 
-          <div style={boxStyle}>
-            {NSDFGraphEnabled ? <NSDFGraph vals={NSDFvals} /> : null}
-            <ToggleGraphButton setEnabled={setNSDFGraphEnabled} />
-          </div>
+      <SamplesContext.Provider value={{ samples: samples }}>
+        {/* <PitchDetector samples={samples} /> */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ScaleGame
+            samples={samples}
+            sampleRate={INPUT_SAMPLE_RATE}
+            NSDFvals={NSDFvals}
+            initAudioInput={micInputSetup}
+          />
         </div>
       </SamplesContext.Provider>
     </>
@@ -161,29 +188,54 @@ function App() {
 
 function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
   const [gameRunning, setGameRunning] = useState(false);
-  const detectedNote = useRef("");
+  const [targetDegree, setTargetDegree] = useState(0);
   const previousDetectedNote = useRef("");
   const currentCounter = useRef(0);
 
   const detector = useRef();
 
+  const scale = C_MAJOR;
+
+  function isNoteCorrect(note) {
+    return note === scale[targetDegree];
+  }
+
+  // function onDetectNote(note) {
+  //   if (isNoteCorrect(note)) {
+  //     console.log("setting increment callback");
+  //     setTargetDegree((d) => {
+  //       console.log("incrementing from ", d);
+  //       return (d + 1) % 7;
+  //     });
+  //   }
+  // }
+
   function onDetectFreq(freq, clarity) {
+    console.log(freq);
+    if (freq > 1300.0) return;
+
+    //console.log(freq);
     const note = noteFromFreq(freq);
     if (note === previousDetectedNote.current) {
       currentCounter.current += 1;
-      if (currentCounter.current === 9) {
-        // console.log("note", note);
-        // console.log("clarity", clarity);
+      if (currentCounter.current === 14) {
         if (clarity > CLARITY_THRESHOLD) {
           console.log(`note ${note} with clarity ${clarity}`);
+
+          if (isNoteCorrect(note)) {
+            console.log("setting increment callback");
+            setTargetDegree((d) => {
+              console.log("incrementing from ", d);
+              return (d + 1) % 7;
+            });
+          }
         }
       }
     } else {
-      //console.log("reset");
       currentCounter.current = 0;
     }
-    previousDetectedNote.current = detectedNote.current;
-    detectedNote.current = note;
+
+    previousDetectedNote.current = note;
   }
 
   function onComputeNSDF(datavals) {
@@ -217,21 +269,42 @@ function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
     };
   }, []);
 
+  useEffect(() => {
+    detector.current.freqCallback = onDetectFreq;
+  }, [targetDegree]);
+
   return (
-    <>
-      {gameRunning ? <p>yes</p> : <p>no</p>}
+    <div style={{ ...boxStyle, alignItems: "center" }}>
+      {gameRunning ? (
+        <>
+          <p style={{ ...textStyle, textAlign: "left" }}>
+            play this note, please:
+          </p>
+          <p style={mainTextStyle}>{scale[targetDegree]}</p>
+        </>
+      ) : (
+        <p style={textStyle}>i am asleep</p>
+      )}
       <StartGameButton startGame={startGame} />
       <StopGameButton stopGame={stopGame} />
-    </>
+    </div>
   );
 }
 
 function StartGameButton({ startGame }) {
-  return <button onClick={() => startGame()}>start</button>;
+  return (
+    <button style={buttonStyle} onClick={() => startGame()}>
+      start
+    </button>
+  );
 }
 
 function StopGameButton({ stopGame }) {
-  return <button onClick={() => stopGame()}>stop</button>;
+  return (
+    <button style={buttonStyle} onClick={() => stopGame()}>
+      stop
+    </button>
+  );
 }
 
 function ToggleGraphButton({ setEnabled }) {
@@ -240,7 +313,7 @@ function ToggleGraphButton({ setEnabled }) {
   }
 
   return (
-    <button onClick={stop} style={buttonStyle}>
+    <button onClick={stop} style={graphButtonStyle}>
       toggle graph
     </button>
   );
