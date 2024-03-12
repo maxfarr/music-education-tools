@@ -211,7 +211,6 @@ function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
   // }
 
   function onDetectFreq(freq, clarity) {
-    console.log(freq);
     if (freq > 1300.0) return;
 
     //console.log(freq);
