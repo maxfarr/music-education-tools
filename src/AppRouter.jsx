@@ -1,5 +1,5 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import PitchDetector from "./PitchDetector";
 import * as Tone from "tone";
 import * as d3 from "d3";
@@ -17,6 +17,17 @@ let INPUT_SAMPLE_RATE = 48000.0;
 
 const CLARITY_THRESHOLD = 0.85;
 const MAX_TAU = 600;
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+  },
+  {
+    path: "/dev",
+    element: <DevTools />,
+  },
+]);
 
 const NOTE_LETTERS = [
   "A",
@@ -95,7 +106,11 @@ const mainTextStyle = {
   fontSize: 80,
 };
 
-function App() {
+function AppRouter() {
+  return <RouterProvider router={router} />;
+}
+
+function DevTools() {
   const samples = useRef([]);
   const NSDFvals = useRef([]);
   const [graphEnabled, setGraphEnabled] = useState(false);
@@ -181,6 +196,10 @@ function App() {
       </div>
     </>
   );
+}
+
+function App() {
+  return <div>try going to /dev you sillyhead</div>;
 }
 
 function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
@@ -403,4 +422,4 @@ function NSDFGraph({ vals }) {
   );
 }
 
-export default App;
+export default AppRouter;
