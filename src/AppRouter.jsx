@@ -1,8 +1,6 @@
-import { createContext, useEffect, useRef, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import * as Tone from "tone";
-import * as d3 from "d3";
 import DevTools from "./DevTools";
+import App from "./App";
 
 const router = createBrowserRouter([
   {
@@ -17,10 +15,6 @@ const router = createBrowserRouter([
 
 function AppRouter() {
   return <RouterProvider router={router} />;
-}
-
-function App() {
-  return <div>try going to /dev you sillyhead</div>;
 }
 
 export default AppRouter;
