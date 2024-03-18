@@ -1,4 +1,5 @@
-import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
+import { createBrowserRouter } from "react-router-dom";
 import PitchDetector from "./PitchDetector";
 import * as Tone from "tone";
 import * as d3 from "d3";
@@ -16,8 +17,6 @@ let INPUT_SAMPLE_RATE = 48000.0;
 
 const CLARITY_THRESHOLD = 0.85;
 const MAX_TAU = 600;
-
-const SamplesContext = createContext();
 
 const NOTE_LETTERS = [
   "A",
@@ -165,23 +164,21 @@ function App() {
         </div>
       </div>
 
-      <SamplesContext.Provider value={{ samples: samples }}>
-        {/* <PitchDetector samples={samples} /> */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <ScaleGame
-            samples={samples}
-            sampleRate={INPUT_SAMPLE_RATE}
-            NSDFvals={NSDFvals}
-            initAudioInput={micInputSetup}
-          />
-        </div>
-      </SamplesContext.Provider>
+      {/* <PitchDetector samples={samples} /> */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <ScaleGame
+          samples={samples}
+          sampleRate={INPUT_SAMPLE_RATE}
+          NSDFvals={NSDFvals}
+          initAudioInput={micInputSetup}
+        />
+      </div>
     </>
   );
 }
