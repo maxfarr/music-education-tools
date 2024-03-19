@@ -8,7 +8,7 @@ export default class PitchDetector {
     W,
     k,
     onDetectFreq,
-    onComputeNSDF
+    onComputeNSDF,
   ) {
     this.samples = samples;
     this.sampleRate = sampleRate;

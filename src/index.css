@@ -4,5 +4,7 @@
 
 @font-face {
   font-family: "donegal";
-  src: local("donegal"), url(./DonegalOne-Regular.ttf) format("truetype");
+  src:
+    local("donegal"),
+    url(./DonegalOne-Regular.ttf) format("truetype");
 }
