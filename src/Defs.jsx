@@ -23,6 +23,27 @@ const GAMES = [
   },
 ];
 
+const SCALES = {
+  C: {
+    major: ["C", "D", "E", "F", "G", "A", "B"],
+  },
+  G: {
+    major: ["G", "A", "B", "C", "D", "E", "F#"],
+  },
+  D: {
+    major: ["D", "E", "F#", "G", "A", "B", "C#"],
+  },
+  A: {
+    major: ["A", "B", "C#", "D", "E", "F#", "G#"],
+  },
+  E: {
+    major: ["E", "F#", "G#", "A", "B", "C#", "D#"],
+  },
+  B: {
+    major: ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+  },
+};
+
 const SIDEBAR_CHIP_SIZE = "96px";
 
-export { GAMES, SIDEBAR_CHIP_SIZE };
+export { GAMES, SCALES, SIDEBAR_CHIP_SIZE };

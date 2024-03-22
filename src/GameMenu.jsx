@@ -34,6 +34,7 @@ function GameMenu() {
           onClick={onSelectedGame}
           onFinishAnimation={onCompletedAnimation}
           id={i}
+          key={i}
           initialPos={getMenuCoords(i)}
           icon={game.icon}
         />
