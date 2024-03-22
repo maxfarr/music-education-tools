@@ -27,7 +27,7 @@ function ScaleGame() {
       ) : (
         <div
           style={{ textShadow: "3px 3px 0px #bb513e" }}
-          className="flex flex-col gap-6 self-center ml-3 text-6xl font-sans font-semibold"
+          className="flex flex-col gap-6 self-center ml-3 text-7xl font-sans font-normal"
         >
           <p className="">root: C</p>
           <p className="">scale: major</p>
