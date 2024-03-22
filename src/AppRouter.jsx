@@ -1,11 +1,12 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import DevTools from "./DevTools";
 import App from "./App";
-import "./index.css";
+import GameMenu from "./GameMenu";
 
 const router = createBrowserRouter([
+  { path: "/", element: <GameMenu /> },
   {
-    path: "/",
+    path: "/app/:game",
     element: <App />,
   },
   {

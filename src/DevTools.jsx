@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import ScaleGame from "./ScaleGame";
+import ScaleGame from "./DevScaleGame";
 import * as Tone from "tone";
 import SignalGraph from "./SignalGraph";
 import NSDFGraph from "./NSDFGraph";
@@ -35,7 +35,7 @@ function DevTools() {
 
         if (local_samples.length > 128 * BATCHES) {
           local_samples = local_samples.slice(
-            local_samples.length - 128 * BATCHES
+            local_samples.length - 128 * BATCHES,
           );
         }
 

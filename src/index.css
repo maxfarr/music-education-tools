@@ -6,5 +6,40 @@
   font-family: "donegal";
   src:
     local("donegal"),
-    url(./DonegalOne-Regular.ttf) format("truetype");
+    url(./assets/fonts/DonegalOne-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "stylish";
+  src:
+    local("stylish"),
+    url(./assets/fonts/Stylish-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "fredoka";
+  src:
+    local("fredoka"),
+    url(./assets/fonts/Fredoka.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "gilroy";
+  src:
+    local("gilroy"),
+    url(./assets/fonts/Gilroy-ExtraBold.otf) format("opentype");
+}
+
+@font-face {
+  font-family: "qanelas";
+  src:
+    local("qanelas"),
+    url(./assets/fonts/QanelasSoft-ExtraBold.otf) format("opentype");
+}
+
+@font-face {
+  font-family: "jellee";
+  src:
+    local("jellee"),
+    url(./assets/fonts/Jellee-Bold.otf) format("opentype");
 }
