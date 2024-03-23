@@ -1,3 +1,5 @@
+import { NOTE_LETTERS } from "./Defs";
+
 const NUM_GAMES = 3;
 const MIDPOINT_GAME_INDEX = (1 + NUM_GAMES) / 2;
 
@@ -22,4 +24,11 @@ function getMenuCoords(gameId) {
   };
 }
 
-export { getSideBarCoords, getMenuCoords };
+const FREQ_TO_NOTE_DENOM = Math.log10(Math.pow(2, 1 / 12));
+
+function freqToNote(freq) {
+  const midi = Math.log10(freq / 27.5) / FREQ_TO_NOTE_DENOM;
+  return NOTE_LETTERS[Math.round(midi) % 12];
+}
+
+export { getSideBarCoords, getMenuCoords, freqToNote };

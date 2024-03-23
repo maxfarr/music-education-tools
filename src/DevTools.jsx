@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import ScaleGame from "./DevScaleGame";
 import * as Tone from "tone";
 import SignalGraph from "./SignalGraph";

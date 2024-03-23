@@ -23,6 +23,21 @@ const GAMES = [
   },
 ];
 
+const NOTE_LETTERS = [
+  "A",
+  "A#",
+  "B",
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+];
+
 const SCALES = {
   C: {
     major: ["C", "D", "E", "F", "G", "A", "B"],
@@ -46,4 +61,21 @@ const SCALES = {
 
 const SIDEBAR_CHIP_SIZE = "96px";
 
-export { GAMES, SCALES, SIDEBAR_CHIP_SIZE };
+const INPUT_BUFFER_BATCHES = 80;
+
+// constants for mcleod pitch detection method
+const MCLEOD_CLARITY_THRESHOLD = 0.8;
+const MCLEOD_WINDOW_SIZE = INPUT_BUFFER_BATCHES * 128;
+
+const MCLEOD_DETECTOR_TICK_MS = 10;
+
+export {
+  GAMES,
+  NOTE_LETTERS,
+  SCALES,
+  SIDEBAR_CHIP_SIZE,
+  INPUT_BUFFER_BATCHES,
+  MCLEOD_CLARITY_THRESHOLD,
+  MCLEOD_WINDOW_SIZE,
+  MCLEOD_DETECTOR_TICK_MS,
+};

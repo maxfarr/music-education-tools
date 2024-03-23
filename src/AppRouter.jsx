@@ -16,7 +16,20 @@ const router = createBrowserRouter([
 ]);
 
 function AppRouter() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <div
+        style={{
+          height: "100vh",
+          width: "100vw",
+        }}
+        className="absolute overflow-hidden mix-blend-multiply"
+      >
+        {/* <img src="/wall.jpg" alt="" className="object-cover" /> */}
+      </div>
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default AppRouter;

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PitchDetector from "./PitchDetector";
+import { MCLEOD_DETECTOR_TICK_MS } from "./Defs";
+import { freqToNote } from "./Utils";
 
 const C_MAJOR = ["C", "D", "E", "F", "G", "A", "B"];
 const G_MAJOR = ["G", "A", "B", "C", "D", "E", "F#"];
@@ -8,7 +10,6 @@ const D_MAJOR = ["D", "E", "F#", "G", "A", "B", "C#"];
 const mainColorHex = "#af1f0e";
 const backgroundHex = "#202020";
 
-const PITCH_DETECT_MS = 10;
 const CLARITY_THRESHOLD = 0.8;
 
 const BATCHES = 80;
@@ -33,28 +34,6 @@ const boxStyle = {
   border: "2px solid " + mainColorHex,
   padding: "20px",
 };
-
-const NOTE_LETTERS = [
-  "A",
-  "A#",
-  "B",
-  "C",
-  "C#",
-  "D",
-  "D#",
-  "E",
-  "F",
-  "F#",
-  "G",
-  "G#",
-];
-
-const NOTE_TO_FREQ_DENOM = Math.log10(Math.pow(2, 1 / 12));
-
-function noteFromFreq(freq) {
-  const midi = Math.log10(freq / 27.5) / NOTE_TO_FREQ_DENOM;
-  return NOTE_LETTERS[Math.round(midi) % 12];
-}
 
 function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
   const [gameRunning, setGameRunning] = useState(false);
@@ -84,7 +63,7 @@ function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
     if (freq > 1300.0) return;
 
     //console.log(freq);
-    const note = noteFromFreq(freq);
+    const note = freqToNote(freq);
     if (note === previousDetectedNote.current) {
       currentCounter.current += 1;
       if (currentCounter.current === 14) {
@@ -126,11 +105,11 @@ function ScaleGame({ samples, sampleRate, NSDFvals, initAudioInput }) {
     detector.current = new PitchDetector(
       samples,
       sampleRate,
-      PITCH_DETECT_MS,
+      MCLEOD_DETECTOR_TICK_MS,
       WINDOW_SIZE,
       0.9,
       onDetectFreq,
-      onComputeNSDF
+      onComputeNSDF,
     );
 
     return () => {
