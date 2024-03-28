@@ -63,7 +63,7 @@ function App() {
     async function launchGraphWorker() {
       try {
         await Tone.getContext().addAudioWorkletModule(
-          "../public/worker.js",
+          "/modules/worker.js",
           "worker",
         );
         let node = Tone.getContext().createAudioWorkletNode("worker");
