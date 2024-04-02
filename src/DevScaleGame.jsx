@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PitchDetector from "./pitch-detector";
 import { MCLEOD_DETECTOR_TICK_MS } from "./Defs";
-import { freqToNote } from "./utils";
+import { freqToNote } from "./utils.js";
 
 const C_MAJOR = ["C", "D", "E", "F", "G", "A", "B"];
 const G_MAJOR = ["G", "A", "B", "C", "D", "E", "F#"];

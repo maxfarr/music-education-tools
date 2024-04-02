@@ -1,5 +1,5 @@
 import { useCycle, motion, animate, useAnimate } from "framer-motion";
-import { getSideBarCoords } from "./Utils";
+import { getSideBarCoords } from "./utils.js";
 import { useEffect, useRef, useState } from "react";
 
 const transition = { duration: 3, ease: "easeInOut" };

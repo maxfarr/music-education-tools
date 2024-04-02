@@ -1,6 +1,6 @@
 import { animate, motion, useCycle } from "framer-motion";
 import MenuGameChip from "./MenuGameChip";
-import { getMenuCoords } from "./Utils";
+import { getMenuCoords } from "./utils.js";
 import { GAMES } from "./Defs.jsx";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
