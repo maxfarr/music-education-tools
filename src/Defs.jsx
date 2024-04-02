@@ -6,8 +6,8 @@ const GAMES = [
   {
     route: "/scalegame",
     title: "Scale Game",
-    colorName: "[#973532]",
-    icon: <Sc className="fill-[#973532]" />,
+    colorName: "[#ef4444]",
+    icon: <Sc className="fill-[#ef4444]" />,
   },
   {
     route: "/staffgame",
@@ -38,24 +38,46 @@ const NOTE_LETTERS = [
   "G#",
 ];
 
+const CIRCLE_OF_FIFTHS = [
+  "C",
+  "G",
+  "D",
+  "A",
+  "E",
+  "B",
+  "F#",
+  "C#",
+  "Ab",
+  "Eb",
+  "Bb",
+  "F",
+];
+
 const SCALES = {
   C: {
     major: ["C", "D", "E", "F", "G", "A", "B"],
+    minor: ["C", "D", "Eb", "F", "G", "Ab", "Bb"],
   },
+  "C#": {},
   G: {
     major: ["G", "A", "B", "C", "D", "E", "F#"],
+    minor: ["G", "A", "Bb", "C", "D", "Eb", "F"],
   },
   D: {
     major: ["D", "E", "F#", "G", "A", "B", "C#"],
+    minor: ["D", "E", "F", "G", "A", "Bb", "C"],
   },
   A: {
     major: ["A", "B", "C#", "D", "E", "F#", "G#"],
+    minor: ["A", "B", "C", "D", "E", "F", "G"],
   },
   E: {
     major: ["E", "F#", "G#", "A", "B", "C#", "D#"],
+    minor: ["E", "F#", "G", "A", "B", "C", "D"],
   },
   B: {
     major: ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+    minor: ["B", "C#", "D", "E", "F#", "G", "A"],
   },
 };
 
@@ -72,6 +94,7 @@ const MCLEOD_DETECTOR_TICK_MS = 10;
 export {
   GAMES,
   NOTE_LETTERS,
+  CIRCLE_OF_FIFTHS,
   SCALES,
   SIDEBAR_CHIP_SIZE,
   INPUT_BUFFER_BATCHES,

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="300"
+   height="300"
+   viewBox="0 0 79.374998 79.375"
+   version="1.1"
+   id="svg1"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path1"
+       style="fill:#000000;stroke:none;stroke-width:0.557818;stroke-dasharray:none"
+       d="M 39.687515,5.3627418 C 26.294761,5.4778208 12.966445,7.2320455 0,10.58624 l 16.967135,63.325948 c 7.199434,-1.794196 14.578612,-2.768861 21.997005,-2.905452 7.898181,0.05894 15.760555,1.068043 23.417632,3.005522 L 79.375,10.58624 C 66.408567,7.2320498 53.080268,5.4778334 39.687515,5.3627418 Z"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="circle_of_fifths_wedge.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </g>
+</svg>

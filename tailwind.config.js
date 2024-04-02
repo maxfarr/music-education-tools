@@ -4,8 +4,19 @@ export default {
   theme: {
     fontFamily: {
       serif: ["stylish", "ui-serif"],
-      sans: ["jellee", "arial"],
+      sans: ["codenext-extrabold", "arial"],
     },
+    // colors: {
+    //   'red': {
+    //     600: '#973532'
+    //   },
+    //   'green': {
+    //     600: '#607A51'
+    //   },
+    //   'blue': {
+    //     600: '#6E65C5'
+    //   }
+    // },
     extend: {},
   },
   plugins: [],

@@ -7,13 +7,7 @@ import StaffGame from "./StaffGame";
 import FireballVillage from "./FireballVillage";
 import * as Tone from "tone";
 
-// bg-orange-100
-// bg-fuschia-700
-// bg-red-700
-// bg-emerald-700
-// bg-[#607A51]
-// bg-[#973532]
-// bg-[#6E65C5]
+//bg-orange-100
 function App() {
   const navigate = useNavigate();
   let params = useParams();

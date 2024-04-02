@@ -1,5 +1,5 @@
 import { motion, useAnimate, useCycle } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   SCALES,
   MCLEOD_CLARITY_THRESHOLD,
@@ -7,18 +7,18 @@ import {
   MCLEOD_DETECTOR_TICK_MS,
 } from "./Defs";
 import Ladder from "./assets/Ladder";
-import PitchDetector from "./PitchDetector";
-import { freqToNote } from "./Utils";
+import PitchDetector from "./pitch-detector";
+import { freqToNote } from "./utils";
+import ScaleSelector from "./ScaleSelector";
 
 function ScaleGame({ startInput, samples, sampleRate, onCleanup }) {
   const [ladderScope, animateLadder] = useAnimate();
-  const [gameRunning, setGameRunning] = useState();
+  const [gameRunning, setGameRunning] = useState(false);
   const [targetDegree, setTargetDegree] = useState(0);
   const animationFinished = useRef(false);
 
-  const [rootNote, cycleRootNote] = useCycle("C", "G", "D", "A", "E", "B");
-
-  const scale = SCALES[rootNote]["major"];
+  const scale = useRef(SCALES["C"]["major"]);
+  console.log("scale", scale);
 
   const previousDetectedNote = useRef("");
   const currentCounter = useRef(0);
@@ -47,9 +47,25 @@ function ScaleGame({ startInput, samples, sampleRate, onCleanup }) {
     };
   }, []);
 
-  function isNoteCorrect(note) {
-    return note === scale[targetDegree];
+  function onSelectScale(scale) {
+    console.log(scale);
+    scale.current = scale;
   }
+
+  // function isNoteCorrect(note) {
+  //   console.log("note", note);
+  //   console.log("target note", scale.current[targetDegree]);
+  //   return note === scale.current[targetDegree];
+  // }
+
+  const isNoteCorrect = useCallback(
+    (note) => {
+      console.log("note", note);
+      console.log("target note", scale.current[targetDegree]);
+      return note === scale.current[targetDegree];
+    },
+    [targetDegree, scale],
+  );
 
   function onDetectFreq(freq, clarity) {
     if (freq > 1300.0) return;
@@ -83,6 +99,7 @@ function ScaleGame({ startInput, samples, sampleRate, onCleanup }) {
       await startInput();
       detector.current.start();
       setGameRunning(true);
+      //console.log("rootNote", rootNote);
     }
   }
 
@@ -128,29 +145,40 @@ function ScaleGame({ startInput, samples, sampleRate, onCleanup }) {
   // );
 
   return (
-    <div className="grid grid-cols-2 h-screen overflow-hidden text-[#973532]">
+    <div className="grid h-screen grid-cols-[465px_auto] overflow-hidden text-red-500">
       <motion.div
         ref={ladderScope}
-        className="self-end overflow-hidden mr-3"
+        className="self-end overflow-hidden"
         initial={{ y: -(window.innerHeight + 50) }}
       >
-        <Ladder className={"fill-[#973532]"} />
+        <Ladder className={"fill-red-500"} />
       </motion.div>
-      <div
-        style={{ textShadow: "3px 3px 0px #bb513e" }}
-        className="flex flex-col gap-6 self-center ml-3 text-7xl font-sans font-normal"
-      >
+      <div className="ml-3 mr-auto flex flex-col gap-6 self-center font-sans text-4xl font-normal">
         {gameRunning ? (
-          <p>{scale[targetDegree]}</p>
+          <p className="text-center text-[150px]">
+            {scale.current[targetDegree]}
+          </p>
         ) : (
-          <>
-            <p>root: {rootNote}</p>
-            <p>scale: major</p>
-            <p>infinite: X</p>
-            <p onClick={startGame}>start!</p>
-          </>
+          <ScaleGameSettings
+            startGame={startGame}
+            onSelectScale={onSelectScale}
+          />
         )}
       </div>
+    </div>
+  );
+}
+
+function ScaleGameSettings({ startGame, onSelectScale }) {
+  return (
+    <div className="flex flex-col place-content-center text-orange-100">
+      <ScaleSelector onSelectScale={onSelectScale} />
+      <button
+        onClick={startGame}
+        className="m-3 mt-0 bg-red-500 py-1 text-7xl italic text-orange-100"
+      >
+        start!
+      </button>
     </div>
   );
 }
